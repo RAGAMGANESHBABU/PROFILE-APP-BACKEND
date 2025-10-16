@@ -45,28 +45,16 @@ app.post("/api/users", async (req, res) => {
   }
 });
 
-// ✅ Fetch first user WITHOUT profilePic (for initial check)
-app.get("/api/users", async (req, res) => {
+// In your backend index.js or routes file
+app.get('/api/users', async (req, res) => {
   try {
-    // ✅ Exclude profilePic to reduce response size
-    const user = await User.findOne().select('-profilePic');
-    if (user) res.status(200).json(user);
-    else res.status(404).json({ message: "No user found" });
-  } catch (err) {
-    res.status(500).json({ message: "Error fetching user", error: err.message });
+    const users = await User.find().select('-profilePic'); // ✅ Exclude profilePic
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
-// ✅ NEW: Get specific user WITH profilePic by ID
-app.get("/api/users/:id", async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (user) res.status(200).json(user);
-    else res.status(404).json({ message: "User not found" });
-  } catch (err) {
-    res.status(500).json({ message: "Error fetching user", error: err.message });
-  }
-});
 
 // ✅ Update profile picture
 app.put("/api/users/:id", async (req, res) => {
@@ -119,13 +107,8 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// ✅ Export for Vercel serverless
-module.exports = app;
-
-// ✅ Start server only if not in Vercel (for local development)
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📝 Environment: ${NODE_ENV}`);
-  });
-}
+// ✅ Start server with environment variable PORT
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`📝 Environment: ${NODE_ENV}`);
+});
